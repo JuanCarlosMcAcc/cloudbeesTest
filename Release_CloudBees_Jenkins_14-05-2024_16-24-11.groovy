@@ -1,0 +1,69 @@
+release 'Release_CloudBees_Jenkins', {
+  plannedEndDate = '2024-05-27T12:14'
+  plannedStartDate = '2024-05-13T12:14'
+  projectName = 'Prueba_1'
+
+  pipeline 'pipeline_Release_CloudBees_Jenkins', {
+    releaseName = 'Release_CloudBees_Jenkins'
+
+    formalParameter 'ec_stagesToRun', {
+      expansionDeferred = '1'
+    }
+
+    stage 'Stage 1', {
+      pipelineName = 'pipeline_Release_CloudBees_Jenkins'
+      task 'Build & Get ID', {
+        actualParameter = [
+          'remote_param': 'Antoñito',
+        ]
+        subprocedure = 'Connect And Run Jenkins'
+        subproject = 'Prueba_1'
+        taskType = 'PROCEDURE'
+      }
+
+      task 'Show ID', {
+        command = '''BUILD_ID=`echo "$[/myStageRuntime/tasks["Build & Get ID"]/job/outputParameters/ID_BUILD]"` #ID del Output
+
+while true; do
+	#comprobar q existe el ID (ha termiando de estar running)
+    RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" -u "admin:11266ce65bf46e8da61a2f919514608e00" "http://localhost:8085/job/cloudbeesTest/$BUILD_ID/api/json")
+	
+    if [ $RESPONSE_CODE -eq 200 ]; then
+    	break # Sal del ciclo while si el ID de construcción existe
+  	fi
+done
+	
+curl -X POST -u admin:11266ce65bf46e8da61a2f919514608e00 -k "http://localhost:8085/job/cloudbeesTest/lastBuild/consoleText"'''
+        enabled = '0'
+        taskType = 'COMMAND'
+      }
+
+      task 'Output', {
+        command = '''BUILD_ID=`echo "$[/myStageRuntime/tasks["Build & Get ID"]/job/outputParameters/ID_BUILD]"` #ID del Output
+
+#comprobar q existe el ID (ha termiando de estar running)
+RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" -u "admin:11266ce65bf46e8da61a2f919514608e00" "http://localhost:8085/job/cloudbeesTest/$BUILD_ID/api/json")
+
+while true; do
+	
+    RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" -u "admin:11266ce65bf46e8da61a2f919514608e00" "http://localhost:8085/job/cloudbeesTest/$BUILD_ID/api/json")
+	
+    if [ $RESPONSE_CODE -eq 200 ]; then
+    	break # Sal del ciclo while si el ID de construcción existe
+  	fi
+done
+	
+curl -X POST -u admin:11266ce65bf46e8da61a2f919514608e00 -k "http://localhost:8085/job/cloudbeesTest/lastBuild/consoleText"'''
+        taskType = 'COMMAND'
+      }
+    }
+
+    // Custom properties
+
+    property 'ec_counters', {
+
+      // Custom properties
+      pipelineCounter = '2'
+    }
+  }
+}
